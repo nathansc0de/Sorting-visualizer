@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
 
 function App() {
+
+  //creates new array based on size passed in
+  function newArray(size) {
+    const array = [];
+    for (let i = 0; i < size; i++) {
+      array.push(randomInt(1, 700)); //random height between 1 and 700 pixels
+    }
+    
+    return array;
+  }
   
   //state to hold value of the size of the array when moving the slider
   const [sizeValue, setSizeValue] = useState(100);
@@ -26,16 +36,6 @@ function App() {
     setSpeedValue(event.target.value);
   };
 
-  //creates new array based on size passed in
-  function newArray(size) {
-    const array = [];
-    for (let i = 0; i < size; i++) {
-      array.push(randomInt(1, 700)); //random height between 1 and 700 pixels
-    }
-    
-    return array;
-  }
-
   //re-randomizes the array
   const randomizeArray = () => {
     setCurrentArray(newArray(sizeValue));
@@ -46,6 +46,27 @@ function App() {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
+  //the algorithms
+  const selectionSort = () => {
+    
+  }
+
+  const bubbleSort = () => {
+    
+  }
+
+  const insertionSort = () => {
+    
+  }
+
+  const mergeSort = () => {
+    
+  }
+
+  const quickSort = () => {
+    
+  }
+
   return (
     <div className="App">
       <div className="content">
@@ -53,7 +74,22 @@ function App() {
           <h1>Sorting Visualizer</h1>
           <div className="options">
             <button className="randomize-btn" onClick={randomizeArray}>Randomize Array</button>
-            <button className="sort-btn">Sort</button>
+            <button className="sort-btn" onClick={() => {
+
+              {/* runs an algorithm based on the selected sort */}
+              if(sortType === 'Selection Sort'){
+                selectionSort();
+              } else if(sortType === 'Bubble Sort'){
+                bubbleSort();
+              } else if(sortType === 'Insertion Sort'){
+                insertionSort();
+              } else if(sortType === 'Merge Sort'){
+                mergeSort();
+              } else{
+                quickSort();
+              }
+
+            }}>Sort</button>
 
             <div className="slider1">
               {'size: ' + sizeValue}
