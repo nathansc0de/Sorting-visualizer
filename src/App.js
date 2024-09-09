@@ -4,7 +4,7 @@ function App() {
 
   //creates new array based on size passed in
   function newArray(size) {
-    const array = [];
+    let array = [];
     for (let i = 0; i < size; i++) {
       array.push(randomInt(1, 700)); //random height between 1 and 700 pixels
     }
@@ -47,23 +47,42 @@ function App() {
   }
 
   //the algorithms
-  const selectionSort = () => {
+  const selectionSort = (arr) => {
+    let sortedArr = [...arr]; // shallow copy to avoid direct mutation
+    let n = sortedArr.length;
+
+    for (let i = 0; i < n - 1; i++) {
+      let minIndex = i;
+
+      for (let j = i + 1; j < n; j++) {
+        if (sortedArr[j] < sortedArr[minIndex]) {
+          minIndex = j;
+        }
+      }
+
+      if (minIndex !== i) {
+        let temp = sortedArr[i];
+        sortedArr[i] = sortedArr[minIndex];
+        sortedArr[minIndex] = temp;
+      }
+    }
+
+    setCurrentArray(sortedArr);
+  }
+
+  const bubbleSort = (a) => {
     
   }
 
-  const bubbleSort = () => {
+  const insertionSort = (a) => {
     
   }
 
-  const insertionSort = () => {
+  const mergeSort = (a) => {
     
   }
 
-  const mergeSort = () => {
-    
-  }
-
-  const quickSort = () => {
+  const quickSort = (a) => {
     
   }
 
@@ -75,18 +94,19 @@ function App() {
           <div className="options">
             <button className="randomize-btn" onClick={randomizeArray}>Randomize Array</button>
             <button className="sort-btn" onClick={() => {
+              let arrayToSort = [...currentArray];
 
               {/* runs an algorithm based on the selected sort */}
               if(sortType === 'Selection Sort'){
-                selectionSort();
+                selectionSort(arrayToSort);
               } else if(sortType === 'Bubble Sort'){
-                bubbleSort();
+                bubbleSort(arrayToSort);
               } else if(sortType === 'Insertion Sort'){
-                insertionSort();
+                insertionSort(arrayToSort);
               } else if(sortType === 'Merge Sort'){
-                mergeSort();
+                mergeSort(arrayToSort);
               } else{
-                quickSort();
+                quickSort(arrayToSort);
               }
 
             }}>Sort</button>
