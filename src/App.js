@@ -101,18 +101,22 @@ function App() {
   }
 
   //plays out the animation using the animation sequence array
-  const playAnimation = (animationSequence) => {
+  const playAnimation = (animationSequence, speedValue) => {
     let i = 0;
+    const delay = 1;
+
     const timeout = (i) => {
       setTimeout(() => {
-        setCurrentArray(animationSequence[i]);
+        setCurrentArray([...animationSequence[i]]);
         i++;
 
         if(i < animationSequence.length) {
           timeout(i);
         }
-      }, 1);
+        console.log(speedValue);
+      }, delay);
     }
+
     timeout(i);
   }
 
@@ -129,7 +133,7 @@ function App() {
               {/* runs an algorithm based on the selected sort */}
               if(sortType === 'Selection Sort'){
                 let animation = selectionSort(arrayToSort);  //get the animations
-                playAnimation(animation);                    //play the animations
+                playAnimation(animation, speedValue);                    //play the animations
               } else if(sortType === 'Bubble Sort'){
                 bubbleSort(arrayToSort);
               } else if(sortType === 'Insertion Sort'){
