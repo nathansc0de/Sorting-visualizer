@@ -25,7 +25,7 @@ function App() {
   const [sortType, setSortType] = useState('');
 
   //state to hold the num of comparisons made
-  const [comparisons, setComparisons] = useState('-');
+  const [comparisons, setComparisons] = useState(['-']);
 
   //state to hold an array of time stamps when the array is being sorted
   //the array of time stamps are then used to display an animation
@@ -43,6 +43,7 @@ function App() {
   //re-randomizes the array
   const randomizeArray = () => {
     setCurrentArray(newArray(sizeValue));
+    setComparisons(['-']);
   };
 
   //returns random int between min and max
@@ -56,12 +57,16 @@ function App() {
     let sortedArr = [...arr]; // shallow copy to avoid direct mutation
     let n = sortedArr.length;
     let animation = [];
+    let comparisonsArr = [];
+    let comparisons = 0;
 
     for (let i = 0; i < n - 1; i++) {
       let minIndex = i;
 
       //find the index of the minimum element in the unsorted part
       for (let j = i + 1; j < n; j++) {
+        comparisons++; //incrament the number of comparisons made
+        comparisonsArr.push(comparisons);
         if (sortedArr[j] < sortedArr[minIndex]) {
           minIndex = j;
         }
@@ -81,16 +86,23 @@ function App() {
     }
 
     animation.push([...sortedArr]); //final state after sorting
-    return animation; //return the animation sequence
+    return {
+      animation: animation, //return the animation sequence
+      comparisons: comparisonsArr // return the num of comparisons
+    }
   }
 
   const bubbleSort = (arr) => {
     let sortedArr = [...arr];
     let n = sortedArr.length;
     let animation = [];
+    let comparisonsArr = [];
+    let comparisons = 0;
 
     for(let i = 0; i < n - 1; i++) {
       for(let j = 0; j < n - i - 1; j++) {
+        comparisons++;
+        comparisonsArr.push(comparisons);
         if(sortedArr[j] > sortedArr[j + 1]) {
           let temp = sortedArr[j];
           sortedArr[j] = sortedArr[j + 1];
@@ -99,8 +111,12 @@ function App() {
         }
       }
     }
+
     animation.push([...sortedArr]);
-    return animation;
+    return {
+      animation: animation, //return the animation sequence
+      comparisons: comparisonsArr // return the num of comparisons
+    }
   }
 
   const insertionSort = (arr) => {
@@ -116,16 +132,21 @@ function App() {
   }
 
   //plays out the animation using the animation sequence array
-  const playAnimation = (animationSequence, speedValue) => {
+  const playAnimation = (animationSequence, speedValue, comparisons) => {
     let i = 0;
     const delay = 1;
 
     const timeout = (i) => {
       setTimeout(() => {
-        setCurrentArray([...animationSequence[i]]);
+        if(animationSequence[i]) {
+          setCurrentArray([...animationSequence[i]]);
+        }
+        if(comparisons[i]) {
+          setComparisons(comparisons[i]);
+        }
         i++;
 
-        if(i < animationSequence.length) {
+        if(i < animationSequence.length || i < comparisons.length) {
           timeout(i);
         }
         console.log(speedValue);
@@ -147,11 +168,13 @@ function App() {
 
               {/* runs an algorithm based on the selected sort */}
               if(sortType === 'Selection Sort'){
-                let animation = selectionSort(arrayToSort);  //get the animations
-                playAnimation(animation, speedValue);        //play the animations
+                let animation = selectionSort(arrayToSort).animation;      //get the animation
+                let comparisons = selectionSort(arrayToSort).comparisons;  //get the num of comparisons
+                playAnimation(animation, speedValue, comparisons);                      //play the animation
               } else if(sortType === 'Bubble Sort'){
-                let animation = bubbleSort(arrayToSort);
-                playAnimation(animation, speedValue);
+                let animation = bubbleSort(arrayToSort).animation;
+                let comparisons = bubbleSort(arrayToSort).comparisons;
+                playAnimation(animation, speedValue, comparisons);
               } else if(sortType === 'Insertion Sort'){
                 insertionSort(arrayToSort);
               } else if(sortType === 'Merge Sort'){
