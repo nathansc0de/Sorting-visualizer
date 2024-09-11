@@ -84,19 +84,34 @@ function App() {
     return animation; //return the animation sequence
   }
 
-  const bubbleSort = (a) => {
+  const bubbleSort = (arr) => {
+    let sortedArr = [...arr];
+    let n = sortedArr.length;
+    let animation = [];
+
+    for(let i = 0; i < n - 1; i++) {
+      for(let j = 0; j < n - i - 1; j++) {
+        if(sortedArr[j] > sortedArr[j + 1]) {
+          let temp = sortedArr[j];
+          sortedArr[j] = sortedArr[j + 1];
+          sortedArr[j + 1] = temp;
+          animation.push([...sortedArr]);
+        }
+      }
+    }
+    animation.push([...sortedArr]);
+    return animation;
+  }
+
+  const insertionSort = (arr) => {
     
   }
 
-  const insertionSort = (a) => {
+  const mergeSort = (arr) => {
     
   }
 
-  const mergeSort = (a) => {
-    
-  }
-
-  const quickSort = (a) => {
+  const quickSort = (arr) => {
     
   }
 
@@ -133,9 +148,10 @@ function App() {
               {/* runs an algorithm based on the selected sort */}
               if(sortType === 'Selection Sort'){
                 let animation = selectionSort(arrayToSort);  //get the animations
-                playAnimation(animation, speedValue);                    //play the animations
+                playAnimation(animation, speedValue);        //play the animations
               } else if(sortType === 'Bubble Sort'){
-                bubbleSort(arrayToSort);
+                let animation = bubbleSort(arrayToSort);
+                playAnimation(animation, speedValue);
               } else if(sortType === 'Insertion Sort'){
                 insertionSort(arrayToSort);
               } else if(sortType === 'Merge Sort'){
