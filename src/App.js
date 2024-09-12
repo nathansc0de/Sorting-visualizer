@@ -27,10 +27,6 @@ function App() {
   //state to hold the num of comparisons made
   const [comparisons, setComparisons] = useState(['-']);
 
-  //state to hold an array of time stamps when the array is being sorted
-  //the array of time stamps are then used to display an animation
-  const [animationSequence, setAnimationSequence] = useState([]);
-
   const [isSorting, setIsSorting] = useState(false);
   const [buttonsDisabled, setButtonsDisabled] = useState(false);
 
@@ -38,6 +34,7 @@ function App() {
   const handleSizeChange = (event) => {
     setSizeValue(event.target.value);
     setCurrentArray(newArray(event.target.value));
+    setIsSorting(false);
   };
   const handleSpeedChange = (event) => {
     setSpeedValue(event.target.value);
@@ -118,13 +115,36 @@ function App() {
 
     animation.push([...sortedArr]);
     return {
-      animation: animation, //return the animation sequence
-      comparisons: comparisonsArr // return the num of comparisons
+      animation: animation,
+      comparisons: comparisonsArr
     }
   }
 
   const insertionSort = (arr) => {
-    
+    let sortedArr = [...arr];
+    let n = sortedArr.length;
+    let animation = [];
+    let comparisonsArr = [];
+    let comparisons = 0;
+
+    for(let i = 1; i < n; i++) {
+      let j = i;
+      while(j > 0 && sortedArr[j - 1] > sortedArr[j]){
+        comparisons++;
+        comparisonsArr.push(comparisons);
+        let temp = sortedArr[j];
+        sortedArr[j] = sortedArr[j - 1];
+        sortedArr[j - 1] = temp;
+        j--;
+        animation.push([...sortedArr]);
+      }
+    }
+
+    animation.push([...sortedArr]);
+    return {
+      animation: animation,
+      comparisons: comparisonsArr
+    }
   }
 
   const mergeSort = (arr) => {
@@ -183,7 +203,9 @@ function App() {
                 let comparisons = bubbleSort(arrayToSort).comparisons;
                 playAnimation(animation, speedValue, comparisons);
               } else if(sortType === 'Insertion Sort'){
-                insertionSort(arrayToSort);
+                let animation = insertionSort(arrayToSort).animation;
+                let comparisons = insertionSort(arrayToSort).comparisons;
+                playAnimation(animation, speedValue, comparisons);
               } else if(sortType === 'Merge Sort'){
                 mergeSort(arrayToSort);
               } else{
