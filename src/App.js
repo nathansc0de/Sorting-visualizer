@@ -31,6 +31,9 @@ function App() {
   //the array of time stamps are then used to display an animation
   const [animationSequence, setAnimationSequence] = useState([]);
 
+  const [isSorting, setIsSorting] = useState(false);
+  const [buttonsDisabled, setButtonsDisabled] = useState(false);
+
   //update the state when the sliders change
   const handleSizeChange = (event) => {
     setSizeValue(event.target.value);
@@ -44,6 +47,7 @@ function App() {
   const randomizeArray = () => {
     setCurrentArray(newArray(sizeValue));
     setComparisons(['-']);
+    setIsSorting(false);
   };
 
   //returns random int between min and max
@@ -148,11 +152,12 @@ function App() {
 
         if(i < animationSequence.length || i < comparisons.length) {
           timeout(i);
+        } else {
+          setButtonsDisabled(false);
         }
         console.log(speedValue);
       }, delay);
     }
-
     timeout(i);
   }
 
@@ -162,15 +167,17 @@ function App() {
         <div className="menu">
           <h1>Sorting Visualizer</h1>
           <div className="options">
-            <button className="randomize-btn" onClick={randomizeArray}>Randomize Array</button>
-            <button className="sort-btn" onClick={() => {
+            <button className="randomize-btn" disabled={buttonsDisabled} onClick={randomizeArray}>Randomize Array</button>
+            <button className="sort-btn" disabled={isSorting} onClick={() => {
               let arrayToSort = [...currentArray];
+              setIsSorting(true);
+              setButtonsDisabled(true);
 
               {/* runs an algorithm based on the selected sort */}
               if(sortType === 'Selection Sort'){
                 let animation = selectionSort(arrayToSort).animation;      //get the animation
                 let comparisons = selectionSort(arrayToSort).comparisons;  //get the num of comparisons
-                playAnimation(animation, speedValue, comparisons);                      //play the animation
+                playAnimation(animation, speedValue, comparisons);         //play the animation
               } else if(sortType === 'Bubble Sort'){
                 let animation = bubbleSort(arrayToSort).animation;
                 let comparisons = bubbleSort(arrayToSort).comparisons;
@@ -189,7 +196,8 @@ function App() {
               {'size: ' + sizeValue}
               <input 
                 type="range" 
-                className="slider" 
+                className="slider"
+                disabled={buttonsDisabled}
                 min="10" 
                 max="200" 
                 value={sizeValue} 
@@ -201,7 +209,8 @@ function App() {
               {'speed: ' + speedValue}
               <input 
                 type="range" 
-                className="slider" 
+                className="slider"
+                disabled={buttonsDisabled} 
                 min="1" 
                 max="100" 
                 value={speedValue} 
@@ -211,11 +220,26 @@ function App() {
             </div>
 
             {/* Select type of sort */}
-            <button className={`button ${sortType === 'Selection Sort' ? 'btn-pressed' : ''}`} onClick={() => setSortType('Selection Sort')}>Selection Sort</button>
-            <button className={`button ${sortType === 'Bubble Sort' ? 'btn-pressed' : ''}`} onClick={() => setSortType('Bubble Sort')}>Bubble Sort</button>
-            <button className={`button ${sortType === 'Insertion Sort' ? 'btn-pressed' : ''}`} onClick={() => setSortType('Insertion Sort')}>Insertion Sort</button>
-            <button className={`button ${sortType === 'Merge Sort' ? 'btn-pressed' : ''}`} onClick={() => setSortType('Merge Sort')}>Merge Sort</button>
-            <button className={`button ${sortType === 'Quick Sort' ? 'btn-pressed' : ''}`} onClick={() => setSortType('Quick Sort')}>Quick Sort</button>
+            <button className={`button ${sortType === 'Selection Sort' ? 'btn-pressed' : ''}`} 
+            onClick={() => setSortType('Selection Sort')}
+            disabled={buttonsDisabled}
+            >Selection Sort</button>
+            <button className={`button ${sortType === 'Bubble Sort' ? 'btn-pressed' : ''}`} 
+            onClick={() => setSortType('Bubble Sort')}
+            disabled={buttonsDisabled}
+            >Bubble Sort</button>
+            <button className={`button ${sortType === 'Insertion Sort' ? 'btn-pressed' : ''}`} 
+            onClick={() => setSortType('Insertion Sort')}
+            disabled={buttonsDisabled}
+            >Insertion Sort</button>
+            <button className={`button ${sortType === 'Merge Sort' ? 'btn-pressed' : ''}`} 
+            onClick={() => setSortType('Merge Sort')}
+            disabled={buttonsDisabled}
+            >Merge Sort</button>
+            <button className={`button ${sortType === 'Quick Sort' ? 'btn-pressed' : ''}`} 
+            onClick={() => setSortType('Quick Sort')}
+            disabled={buttonsDisabled}
+            >Quick Sort</button>
           </div>
         </div>
 
