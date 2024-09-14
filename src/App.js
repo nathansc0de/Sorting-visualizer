@@ -148,7 +148,50 @@ function App() {
   }
 
   const mergeSort = (arr) => {
-    
+    if(arr.length === 1) {
+      return arr; //base case: array of length 1 is already sorted
+    }
+  
+    //find the middle index of the array
+    const mid = Math.floor(arr.length / 2);
+  
+    //recursively split both halves
+    const left = mergeSort(arr.slice(0, mid));
+    const right = mergeSort(arr.slice(mid));
+  
+    //merge the two sorted halves
+    return merge(left, right);
+  }
+
+  //merge function to merge two sorted arrays from mergeSort
+  const merge = (left, right) => {
+    let sortedArray = [];
+    let i = 0, j = 0;
+
+    //compare elements from both arrays and push the smaller one to sortedArray
+    while (i < left.length && j < right.length) {
+      if (left[i] < right[j]) {
+        sortedArray.push(left[i]);
+        i++;
+      } else {
+        sortedArray.push(right[j]);
+        j++;
+      }
+    }
+
+    //add remaining elements from left array if any
+    while (i < left.length) {
+      sortedArray.push(left[i]);
+      i++;
+    }
+
+    //add remaining elements from right array if any
+    while (j < right.length) {
+      sortedArray.push(right[j]);
+      j++;
+    }
+
+    return sortedArray;
   }
 
   const quickSort = (arr) => {
