@@ -67,12 +67,12 @@ function App() {
       //find the index of the minimum element in the unsorted part
       for (let j = i + 1; j < n; j++) {
         comparisons++; //incrament the number of comparisons made
-        comparisonsArr.push(comparisons);
         if (sortedArr[j] < sortedArr[minIndex]) {
           minIndex = j;
         }
         //capture the current state of the array for animation
         animation.push([...sortedArr]);
+        comparisonsArr.push(comparisons);
       }
 
       //swap the found minimum element with the first unsorted element
@@ -83,10 +83,12 @@ function App() {
 
         //capture the current state after swap for animation
         animation.push([...sortedArr]);
+        comparisonsArr.push(comparisons);
       }
     }
 
     animation.push([...sortedArr]); //final state after sorting
+    comparisonsArr.push(comparisons);
     return {
       animation: animation, //return the animation sequence
       comparisons: comparisonsArr // return the num of comparisons
@@ -103,17 +105,18 @@ function App() {
     for(let i = 0; i < n - 1; i++) {
       for(let j = 0; j < n - i - 1; j++) {
         comparisons++;
-        comparisonsArr.push(comparisons);
         if(sortedArr[j] > sortedArr[j + 1]) {
           let temp = sortedArr[j];
           sortedArr[j] = sortedArr[j + 1];
           sortedArr[j + 1] = temp;
           animation.push([...sortedArr]);
+          comparisonsArr.push(comparisons);
         }
       }
     }
 
     animation.push([...sortedArr]);
+    comparisonsArr.push(comparisons);
     return {
       animation: animation,
       comparisons: comparisonsArr
@@ -131,71 +134,108 @@ function App() {
       let j = i;
       while(j > 0 && sortedArr[j - 1] > sortedArr[j]){
         comparisons++;
-        comparisonsArr.push(comparisons);
         let temp = sortedArr[j];
         sortedArr[j] = sortedArr[j - 1];
         sortedArr[j - 1] = temp;
         j--;
         animation.push([...sortedArr]);
+        comparisonsArr.push(comparisons);
       }
     }
 
     animation.push([...sortedArr]);
+    comparisonsArr.push(comparisons);
     return {
       animation: animation,
       comparisons: comparisonsArr
     }
   }
 
-  const mergeSort = (arr) => {
-    if(arr.length === 1) {
-      return arr; //base case: array of length 1 is already sorted
+  const mergeSort = (arr, sorting) => {
+    if(!sorting) {
+      let animation = [];
+      let comparisonsArr = [];
+      let comparisons = 0; 
+      sorting = true;
+    } 
+
+    if(arr.length <= 1) {
+      return arr;
     }
   
     //find the middle index of the array
-    const mid = Math.floor(arr.length / 2);
+    let mid = Math.floor(arr.length / 2);
   
     //recursively split both halves
-    const left = mergeSort(arr.slice(0, mid));
-    const right = mergeSort(arr.slice(mid));
+    let left = mergeSort(arr.slice(0, mid));
+    let right = mergeSort(arr.slice(mid));
   
     //merge the two sorted halves
-    return merge(left, right);
+    let mergedResult = merge(left, right, comparisons);
+
+    console.log('loop');
+    return{
+      sortedArr: mergedResult.sortedArr,
+      animation: mergedResult.animation,
+      comparisons: mergedResult.comparisons
+    }
   }
 
   //merge function to merge two sorted arrays from mergeSort
-  const merge = (left, right) => {
-    let sortedArray = [];
-    let i = 0, j = 0;
+  const merge = (left, right, comparisons) => {
+    let sortedArr = [];
 
     //compare elements from both arrays and push the smaller one to sortedArray
-    while (i < left.length && j < right.length) {
-      if (left[i] < right[j]) {
-        sortedArray.push(left[i]);
-        i++;
+    while (left.length && right.length) {
+      if (left[0] < right[0]) {
+        sortedArr.push(left.shift());
       } else {
-        sortedArray.push(right[j]);
-        j++;
+        sortedArr.push(right.shift());
       }
+      comparisons++;
     }
 
     //add remaining elements from left array if any
-    while (i < left.length) {
-      sortedArray.push(left[i]);
-      i++;
+    if (left.length) {
+      sortedArr.push(left.shift());
     }
 
     //add remaining elements from right array if any
-    while (j < right.length) {
-      sortedArray.push(right[j]);
-      j++;
+    if (right.length) {
+      sortedArr.push(right.shift());
     }
 
-    return sortedArray;
+    return sortedArr;
   }
 
   const quickSort = (arr) => {
-    
+    let start = 0;
+    let end = arr.length - 1;
+
+    if(end <= start) return;
+
+    let pivot = partition(arr, start, end);
+    quickSort(arr, start, pivot - 1);
+    quickSort(arr, pivot + 1, end);
+  }
+
+  const partition = (arr, start, end) => {
+    let pivot = arr[end];
+    let i = start - 1;
+
+    for(let j = start; j <= end - 1; j++) {
+      if(arr[j] < pivot) {
+        i++;
+        let temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+      }
+    }
+
+    i++;
+    let temp = arr[i];
+    arr[i] = arr[end];
+    arr[end] = temp;
   }
 
   //plays out the animation using the animation sequence array
@@ -233,24 +273,33 @@ function App() {
             <button className="randomize-btn" disabled={buttonsDisabled} onClick={randomizeArray}>Randomize Array</button>
             <button className="sort-btn" disabled={isSorting} onClick={() => {
               let arrayToSort = [...currentArray];
-              setIsSorting(true);
-              setButtonsDisabled(true);
 
               {/* runs an algorithm based on the selected sort */}
               if(sortType === 'Selection Sort'){
+                setIsSorting(true);
+                setButtonsDisabled(true);
                 let animation = selectionSort(arrayToSort).animation;      //get the animation
                 let comparisons = selectionSort(arrayToSort).comparisons;  //get the num of comparisons
                 playAnimation(animation, speedValue, comparisons);         //play the animation
               } else if(sortType === 'Bubble Sort'){
+                setIsSorting(true);
+                setButtonsDisabled(true);
                 let animation = bubbleSort(arrayToSort).animation;
                 let comparisons = bubbleSort(arrayToSort).comparisons;
                 playAnimation(animation, speedValue, comparisons);
               } else if(sortType === 'Insertion Sort'){
+                setIsSorting(true);
+                setButtonsDisabled(true);
                 let animation = insertionSort(arrayToSort).animation;
                 let comparisons = insertionSort(arrayToSort).comparisons;
                 playAnimation(animation, speedValue, comparisons);
               } else if(sortType === 'Merge Sort'){
-                mergeSort(arrayToSort);
+                let sorting = false;
+                setIsSorting(true);
+                setButtonsDisabled(true);
+                let animation = mergeSort(arrayToSort, sorting).animation;
+                let comparisons = mergeSort(arrayToSort, sorting).comparisons;
+                playAnimation(animation, speedValue, comparisons);
               } else{
                 quickSort(arrayToSort);
               }
