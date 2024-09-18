@@ -151,66 +151,63 @@ function App() {
     }
   }
 
-  const mergeSort = (arr, sorting) => {
-    if(!sorting) {
-      let animation = [];
-      let comparisonsArr = [];
-      let comparisons = 0; 
-      sorting = true;
-    } 
-
-    if(arr.length <= 1) {
-      return arr;
+  const mergeSort = (arr, fullArray = [...arr], animation = [], comparisonsArr = [], comparisons = { count: 0 }, start = 0, end = arr.length) => {
+    if (arr.length <= 1) {
+      return { sortedArr: arr, fullArray, animation, comparisonsArr, comparisons };
     }
   
-    //find the middle index of the array
-    let mid = Math.floor(arr.length / 2);
+    const mid = Math.floor(arr.length / 2);
   
-    //recursively split both halves
-    let left = mergeSort(arr.slice(0, mid));
-    let right = mergeSort(arr.slice(mid));
+    // Recursively sort both halves
+    const leftResult = mergeSort(arr.slice(0, mid), fullArray, animation, comparisonsArr, comparisons, start, start + mid);
+    const rightResult = mergeSort(arr.slice(mid), leftResult.fullArray, leftResult.animation, leftResult.comparisonsArr, comparisons, start + mid, end);
   
-    //merge the two sorted halves
-    let mergedResult = merge(left, right, comparisons);
-
-    console.log('loop');
-    return{
-      sortedArr: mergedResult.sortedArr,
-      animation: mergedResult.animation,
-      comparisons: mergedResult.comparisons
-    }
-  }
-
-  //merge function to merge two sorted arrays from mergeSort
-  const merge = (left, right, comparisons) => {
+    // Merge the two halves
+    return merge(leftResult.sortedArr, rightResult.sortedArr, leftResult.fullArray, leftResult.animation, leftResult.comparisonsArr, comparisons, start, end);
+  };
+  
+  const merge = (left, right, fullArray, animation, comparisonsArr, comparisons, start, end) => {
     let sortedArr = [];
-
-    //compare elements from both arrays and push the smaller one to sortedArray
+    let i = start;
+  
     while (left.length && right.length) {
+      comparisons.count++; // Every comparison should be counted globally
       if (left[0] < right[0]) {
         sortedArr.push(left.shift());
       } else {
         sortedArr.push(right.shift());
       }
-      comparisons++;
+      fullArray[i++] = sortedArr[sortedArr.length - 1];
+  
+      // Capture the state of the full array for animation
+      animation.push([...fullArray]);
+      comparisonsArr.push(comparisons.count);
     }
-
-    //add remaining elements from left array if any
-    if (left.length) {
+  
+    // Handle remaining elements in the left array
+    while (left.length) {
+      comparisons.count++; // Still count these comparisons
       sortedArr.push(left.shift());
+      fullArray[i++] = sortedArr[sortedArr.length - 1];
+  
+      animation.push([...fullArray]);
+      comparisonsArr.push(comparisons.count);
     }
-
-    //add remaining elements from right array if any
-    if (right.length) {
+  
+    // Handle remaining elements in the right array
+    while (right.length) {
+      comparisons.count++; // Still count these comparisons
       sortedArr.push(right.shift());
+      fullArray[i++] = sortedArr[sortedArr.length - 1];
+  
+      animation.push([...fullArray]);
+      comparisonsArr.push(comparisons.count);
     }
+  
+    return { sortedArr, fullArray, animation, comparisonsArr, comparisons };
+  };  
 
-    return sortedArr;
-  }
-
-  const quickSort = (arr) => {
-    let start = 0;
-    let end = arr.length - 1;
+  const quickSort = (arr, start, end) => {
 
     if(end <= start) return;
 
@@ -236,6 +233,8 @@ function App() {
     let temp = arr[i];
     arr[i] = arr[end];
     arr[end] = temp;
+
+    return i;
   }
 
   //plays out the animation using the animation sequence array
@@ -294,14 +293,14 @@ function App() {
                 let comparisons = insertionSort(arrayToSort).comparisons;
                 playAnimation(animation, speedValue, comparisons);
               } else if(sortType === 'Merge Sort'){
-                let sorting = false;
                 setIsSorting(true);
                 setButtonsDisabled(true);
-                let animation = mergeSort(arrayToSort, sorting).animation;
-                let comparisons = mergeSort(arrayToSort, sorting).comparisons;
+                let mergeSortResult = mergeSort(arrayToSort);
+                let animation = mergeSortResult.animation;
+                let comparisons = mergeSortResult.comparisonsArr;
                 playAnimation(animation, speedValue, comparisons);
               } else{
-                quickSort(arrayToSort);
+                quickSort(arrayToSort, 0, arrayToSort.length - 1);
               }
 
             }}>Sort</button>
